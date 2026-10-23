@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Placeholder Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .image-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .image-item img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 8px;
+        }
+        .download-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Placeholder Images</h1>
+    
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Click the "Download All Images" button below to download a zip file with all placeholder images.</li>
+            <li>Extract the zip file to get the 'images' folder.</li>
+            <li>Copy the 'images' folder to your frontend's 'public' directory (frontend/public/).</li>
+        </ol>
+    </div>
+
+    <button id="downloadBtn" class="download-btn">Download All Images</button>
+
+    <h3>Preview of Images:</h3>
+    <div class="image-container" id="imageContainer">
+        <!-- Images will be added here by JavaScript -->
+    </div>
+
+    <script>
+        const images = [
+            { name: 'hero-bg.jpg', width: 1920, height: 1080, text: 'Hero Background' },
+            { name: 'rings-category.jpg', width: 800, height: 600, text: 'Rings' },
+            { name: 'necklaces-category.jpg', width: 800, height: 600, text: 'Necklaces' },
+            { name: 'earrings-category.jpg', width: 800, height: 600, text: 'Earrings' },
+            { name: 'bracelets-category.jpg', width: 800, height: 600, text: 'Bracelets' },
+            { name: 'diamond-ring.jpg', width: 600, height: 800, text: 'Diamond Ring' },
+            { name: 'gold-necklace.jpg', width: 600, height: 800, text: 'Gold Necklace' },
+            { name: 'pearl-earrings.jpg', width: 600, height: 800, text: 'Pearl Earrings' },
+            { name: 'special-offer.jpg', width: 1200, height: 628, text: 'Special Offer' }
+        ];
+
+        // Display image previews
+        const imageContainer = document.getElementById('imageContainer');
+        
+        images.forEach(img => {
+            const imgUrl = `https://placehold.co/${img.width}x${img.height}/4f46e5/ffffff?text=${encodeURIComponent(img.text)}`;
+            const imgElement = document.createElement('div');
+            imgElement.className = 'image-item';
+            imgElement.innerHTML = `
+                <img src="${imgUrl}" alt="${img.text}" loading="lazy">
+                <div>${img.name}</div>
+                <div>${img.width} × ${img.height}</div>
+            `;
+            imageContainer.appendChild(imgElement);
+        });
+
+        // Download all images as zip
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            try {
+                // Create a temporary link to trigger the download
+                const link = document.createElement('a');
+                link.href = 'https://github.com/placeholder-co/placeholder-images/archive/refs/heads/main.zip';
+                link.download = 'gahana-jewelry-placeholder-images.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                alert('Download started! Please extract the zip file and copy the images to your frontend/public/images/ directory.');
+            } catch (error) {
+                console.error('Error downloading images:', error);
+                alert('Error downloading images. Please try again or contact support.');
+            }
+        });
+    </script>
+</body>
+</html>
