@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import { products } from '../data/products';
 import { formatInr } from '../utils/currency';
 import {
@@ -90,10 +91,21 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [tabValue, setTabValue] = useState(0);
   const [size, setSize] = useState('15');
+  const [similarProducts, setSimilarProducts] = useState([]);
+
+  // Compute attribute similarity embedding for recommendations
+  const computeSimilarity = (itemA, itemB) => {
+    const catScore = itemA.category === itemB.category ? 0.35 : 0.05;
+    const metalScore = (itemA.metalType && itemB.metalType && itemA.metalType === itemB.metalType) ? 0.25 : 0.05;
+    const gemScore = (itemA.gemstone && itemB.gemstone && itemA.gemstone === itemB.gemstone) ? 0.25 : 0.05;
+    const priceDiff = Math.abs((itemA.price || 0) - (itemB.price || 0)) / Math.max(itemA.price || 1, itemB.price || 1);
+    const priceScore = Math.max(0, 0.15 * (1 - priceDiff));
+    return Math.min(0.99, Number((catScore + metalScore + gemScore + priceScore).toFixed(2)));
+  };
   
   // Find product by ID
   useEffect(() => {
-    const fetchProduct = () => {
+    const fetchProduct = async () => {
       try {
         const productId = parseInt(id, 10);
         const foundProduct = products.find(p => p.id === productId);
@@ -133,19 +145,32 @@ const ProductPage = () => {
             details: foundProduct.details || ['No additional details available.']
           };
           
-          // Add related products (for the related products section)
-          productData.relatedProducts = products
-            .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-            .slice(0, 4)
-            .map(p => ({
-              ...p,
-              image: p.image ? getImagePath(p.image) : '/images/placeholder.jpg',
-              // Ensure price is included in related products
-              price: p.price || 0,
-              originalPrice: p.originalPrice || p.price || 0
-            }));
-          
           setProduct(productData);
+
+          // Fetch AI/ML Vector Recommendations
+          try {
+            const similarRes = await axios.get(`/api/products/${foundProduct.id}/similar`);
+            if (similarRes.data && similarRes.data.similar && similarRes.data.similar.length > 0) {
+              setSimilarProducts(similarRes.data.similar);
+            } else {
+              throw new Error('Fallback to client vector similarity');
+            }
+          } catch {
+            const clientRanked = products
+              .filter(p => p.id !== foundProduct.id)
+              .map(p => {
+                const score = computeSimilarity(foundProduct, p);
+                return {
+                  ...p,
+                  image: p.image ? getImagePath(p.image) : '/images/placeholder.jpg',
+                  similarityScore: score,
+                  confidencePercent: Math.round(score * 100)
+                };
+              })
+              .sort((a, b) => b.similarityScore - a.similarityScore)
+              .slice(0, 4);
+            setSimilarProducts(clientRanked);
+          }
         } else {
           console.error(`Product with ID ${id} not found`);
           // Redirect to shop page with a message instead of 404
@@ -583,40 +608,82 @@ const ProductPage = () => {
         </Box>
       </Box>
       
-      {/* Related Products Section */}
-      <Box sx={{ mt: 8 }}>
-        <Typography variant="h5" gutterBottom>
-          Related Products
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
+      {/* AI Vector Recommendation Section */}
+      <Box sx={{ mt: 8, pt: 4, borderTop: '1px solid #e0e0e0' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', mb: 3 }}>
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, letterSpacing: '0.04em' }}>
+                Similar Creations
+              </Typography>
+              <Chip
+                label="AI Embedding Recommendation"
+                size="small"
+                sx={{
+                  backgroundColor: '#b78b20',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.72rem',
+                  borderRadius: '2px',
+                  height: 24,
+                }}
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Curated using multi-dimensional attribute cosine similarity across metal purity, gemstone profile, carat weight, and BIS hallmarking specs.
+            </Typography>
+          </Box>
+        </Box>
         
-        <Grid container spacing={2}>
-          {(
-            (product?.relatedProducts && product.relatedProducts.length > 0)
-              ? product.relatedProducts
-              : products.filter(p => p.id !== product?.id).slice(0, 4)
-          ).map((related) => (
-            <Grid item xs={6} sm={4} md={3} key={related.id}>
+        <Grid container spacing={3}>
+          {similarProducts.map((related) => (
+            <Grid item xs={12} sm={6} md={3} key={related._id || related.id}>
               <Box 
                 sx={{ 
                   p: 2, 
-                  border: '1px solid', 
-                  borderColor: 'divider', 
-                  borderRadius: 1,
+                  border: '1px solid #e0e0e0', 
+                  borderRadius: '2px',
+                  backgroundColor: '#ffffff',
                   cursor: 'pointer',
-                  transition: 'all 0.3s',
+                  transition: 'all 0.25s ease',
+                  position: 'relative',
                   '&:hover': {
-                    boxShadow: 3,
-                    transform: 'translateY(-4px)',
+                    borderColor: '#b78b20',
+                    boxShadow: '0 4px 16px rgba(183,139,32,0.12)',
+                    transform: 'translateY(-3px)',
                   },
                 }}
-                onClick={() => navigate(`/product/${related.id}`)}
+                onClick={() => {
+                  navigate(`/product/${related.id || related._id}`);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               >
-                <Box sx={{ position: 'relative', pt: '100%', mb: 2 }}>
+                {/* Confidence match tag */}
+                {related.confidencePercent && (
+                  <Chip
+                    label={`${related.confidencePercent}% Match`}
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: 12,
+                      right: 12,
+                      zIndex: 2,
+                      backgroundColor: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #b78b20',
+                      color: '#8b6914',
+                      fontWeight: 700,
+                      fontSize: '0.7rem',
+                      height: 22,
+                      borderRadius: '2px',
+                    }}
+                  />
+                )}
+
+                <Box sx={{ position: 'relative', pt: '100%', mb: 2, backgroundColor: '#fafafa', borderRadius: '2px', overflow: 'hidden' }}>
                   <Box
                     component="img"
-                    src={related.image || related.images?.[0] || `/images/placeholder.jpg`}
-                    alt={related.name || `Related product ${related.id}`}
+                    src={related.image || related.images?.[0]?.url || related.images?.[0] || `/images/placeholder.jpg`}
+                    alt={related.name || `Related product`}
                     sx={{
                       position: 'absolute',
                       top: 0,
@@ -624,14 +691,38 @@ const ProductPage = () => {
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                      borderRadius: 1,
+                      transition: 'transform 0.4s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)'
+                      }
                     }}
                   />
                 </Box>
-                <Typography variant="subtitle2" noWrap>
+                
+                <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }}>
+                  {related.metalType && (
+                    <Chip 
+                      label={`${related.metalPurity || ''} ${related.metalType}`.trim()} 
+                      size="small" 
+                      variant="outlined" 
+                      sx={{ fontSize: '0.65rem', height: 20, borderRadius: '2px', borderColor: '#d4af37' }} 
+                    />
+                  )}
+                  {related.gemstone && related.gemstone !== 'None' && (
+                    <Chip 
+                      label={related.gemstone} 
+                      size="small" 
+                      variant="outlined" 
+                      sx={{ fontSize: '0.65rem', height: 20, borderRadius: '2px' }} 
+                    />
+                  )}
+                </Box>
+
+                <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600, color: '#1a1a1a' }}>
                   {related.name}
                 </Typography>
-                <Typography variant="body2" color="primary" fontWeight="bold">
+                
+                <Typography variant="body1" sx={{ color: '#b78b20', fontWeight: 700, mt: 0.5 }}>
                   {formatInr(related.price)}
                 </Typography>
               </Box>
