@@ -29,9 +29,9 @@ import {
   Remove as RemoveIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-import { removeFromCart, updateCartItemQty, saveShippingAddress } from '../features/cart/cartSlice';
+import { removeFromCart, updateCartItemQty } from '../features/cart/cartSlice';
 import { toast } from 'react-toastify';
-import { formatInrAsUsd } from '../utils/currency';
+import { formatInr } from '../utils/currency';
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -124,7 +124,7 @@ const CartPage = () => {
                           {item.metalType} • Size: {item.size || 'N/A'}
                         </Typography>
                         <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                          {formatInrAsUsd(Number(item?.price) || 0)}
+                          {formatInr(Number(item?.price) || 0)}
                         </Typography>
                       </Box>
                       <IconButton 
@@ -177,7 +177,7 @@ const CartPage = () => {
                       </Box>
                       
                       <Typography variant="subtitle1" fontWeight="medium">
-                        {formatInrAsUsd((Number(item?.price) || 0) * (Number(item?.qty) || 0))}
+                        {formatInr((Number(item?.price) || 0) * (Number(item?.qty) || 0))}
                       </Typography>
                     </Box>
                   </Box>
@@ -225,7 +225,7 @@ const CartPage = () => {
                         </TableCell>
                         <TableCell align="right">
                           <Typography variant="body1">
-                            {formatInrAsUsd(Number(item?.price) || 0)}
+                            {formatInr(Number(item?.price) || 0)}
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
@@ -279,7 +279,7 @@ const CartPage = () => {
                         </TableCell>
                         <TableCell align="right">
                           <Typography variant="subtitle1">
-                            {formatInrAsUsd((Number(item?.price) || 0) * (Number(item?.qty) || 0))}
+                            {formatInr((Number(item?.price) || 0) * (Number(item?.qty) || 0))}
                           </Typography>
                         </TableCell>
                         <TableCell align="right">
@@ -363,7 +363,7 @@ const CartPage = () => {
                   Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)} items)
                 </Typography>
                 <Typography variant="body2">
-                  {formatInrAsUsd(Number(itemsPrice) || 0)}
+                  {formatInr(Number(itemsPrice) || 0)}
                 </Typography>
               </Box>
               
@@ -374,7 +374,7 @@ const CartPage = () => {
                 <Typography variant="body2">
                   {(!shippingPrice || shippingPrice === 0)
                     ? 'Free'
-                    : formatInrAsUsd(Number(shippingPrice) || 0)}
+                    : formatInr(Number(shippingPrice) || 0)}
                 </Typography>
               </Box>
               
@@ -383,7 +383,7 @@ const CartPage = () => {
                   Tax (estimated)
                 </Typography>
                 <Typography variant="body2">
-                  {formatInrAsUsd(Number(taxPrice) || 0)}
+                  {formatInr(Number(taxPrice) || 0)}
                 </Typography>
               </Box>
               
@@ -394,7 +394,7 @@ const CartPage = () => {
                   Order Total
                 </Typography>
                 <Typography variant="subtitle1" fontWeight="bold">
-                  {formatInrAsUsd(Number(totalPrice) || 0)}
+                  {formatInr(Number(totalPrice) || 0)}
                 </Typography>
               </Box>
               

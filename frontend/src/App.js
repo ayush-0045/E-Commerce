@@ -1,7 +1,7 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, CircularProgress } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
+import { CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import store from './store';
@@ -96,33 +96,6 @@ const theme = createTheme({
     },
   },
 });
-
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
-  const location = useLocation();
-  
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh' 
-      }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-  
-  if (!isAuthenticated) {
-    // Redirect to login, but save the location they were trying to go to
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  return children;
-};
 
 function App() {
   return (

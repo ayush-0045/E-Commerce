@@ -11,29 +11,23 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   ListItemAvatar,
   Avatar,
   Button,
   LinearProgress,
   CircularProgress,
-  useTheme,
-  useMediaQuery
 } from '@mui/material';
 import {
   ShoppingCart as OrdersIcon,
   LocalOffer as ProductsIcon,
   People as UsersIcon,
   AttachMoney as RevenueIcon,
-  TrendingUp as GrowthIcon,
   Star as StarIcon,
-  AccessTime as RecentIcon,
-  MoreVert as MoreIcon,
   ArrowUpward as ArrowUpIcon,
   ArrowDownward as ArrowDownIcon
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 // Sample data - replace with actual API calls
 const salesData = [
@@ -179,8 +173,6 @@ const StatCard = ({ title, value, change, icon: Icon, color }) => {
 };
 
 const Dashboard = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   
   const [isLoading, setIsLoading] = useState(true);

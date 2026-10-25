@@ -283,7 +283,7 @@ const ShopPage = () => {
     
     if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 600000) {
       activeFilters.push({
-        label: `${formatInrAsUsd(filters.priceRange[0])} - ${formatInrAsUsd(filters.priceRange[1])}`,
+        label: `${formatInr(filters.priceRange[0])} - ${formatInr(filters.priceRange[1])}`,
         onDelete: () => handleFilterChange('priceRange', [0, 600000])
       });
     }
@@ -366,8 +366,7 @@ const ShopPage = () => {
             step={5000}
             marks={priceMarks}
             valueLabelFormat={(value) => {
-              // Format price in USD
-              return formatInrAsUsd(value);
+              return formatInr(value);
             }}
             sx={{
               mt: 4,
@@ -412,19 +411,19 @@ const ShopPage = () => {
             <Box sx={{ flex: 1, textAlign: 'center', borderRight: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <Typography variant="caption" display="block" sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 0.5 }}>Min</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'white' }}>
-                {formatInrAsUsd(filters.priceRange[0])}
+                {formatInr(filters.priceRange[0])}
               </Typography>
             </Box>
             <Box sx={{ flex: 2, textAlign: 'center', px: 2 }}>
               <Typography variant="caption" display="block" sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 0.5 }}>Price Range</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#d4af37' }}>
-                {formatInrAsUsd(filters.priceRange[0])} - {formatInrAsUsd(filters.priceRange[1])}
+                {formatInr(filters.priceRange[0])} - {formatInr(filters.priceRange[1])}
               </Typography>
             </Box>
             <Box sx={{ flex: 1, textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <Typography variant="caption" display="block" sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 0.5 }}>Max</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'white' }}>
-                {formatInrAsUsd(filters.priceRange[1])}
+                {formatInr(filters.priceRange[1])}
               </Typography>
             </Box>
           </Box>
@@ -699,7 +698,7 @@ const ShopPage = () => {
                             {product.metalType} • {product.gemstone}
                           </Typography>
                           <Typography variant="subtitle2" color="primary" fontWeight="bold">
-                            {formatInrAsUsd(product.price)}
+                            {formatInr(product.price)}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>

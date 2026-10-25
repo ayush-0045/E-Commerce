@@ -52,9 +52,11 @@ export const calculateJewelryBreakdown = (basePrice) => {
   };
 };
 
-export default {
+const currencyUtils = {
   formatInr,
   formatInrAsUsd,
   formatUsd,
   calculateJewelryBreakdown,
 };
+
+export default currencyUtils;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { products } from '../data/products';
-import { formatInrAsUsd } from '../utils/currency';
+import { formatInr } from '../utils/currency';
 import {
   Box,
   Typography,
@@ -85,11 +85,6 @@ const ProductPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [product, setProduct] = useState(null);
-  
-  // Format price in USD
-  const formatPrice = (price) => {
-    return formatInrAsUsd(price);
-  };
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -326,15 +321,15 @@ const ProductPage = () => {
                   color="text.secondary"
                   sx={{ textDecoration: 'line-through', display: 'inline', mr: 1 }}
                 >
-{formatInrAsUsd(product.originalPrice)}
+{formatInr(product.originalPrice)}
                 </Typography>
               )}
               <Typography variant="h4" color="primary" display="inline" fontWeight="bold">
-                {formatInrAsUsd(product.price)}
+                {formatInr(product.price)}
               </Typography>
               {product.isOnSale && (
                 <Chip 
-                  label={`Save ${formatInrAsUsd(product.originalPrice - product.price)}`} 
+                  label={`Save ${formatInr(product.originalPrice - product.price)}`} 
                   color="error" 
                   size="small" 
                   sx={{ ml: 1, fontWeight: 'bold' }}
@@ -637,7 +632,7 @@ const ProductPage = () => {
                   {related.name}
                 </Typography>
                 <Typography variant="body2" color="primary" fontWeight="bold">
-                  {formatInrAsUsd(related.price)}
+                  {formatInr(related.price)}
                 </Typography>
               </Box>
             </Grid>

@@ -24,8 +24,6 @@ import {
   Alert,
 } from '@mui/material';
 import {
-  LocalShipping as ShippingIcon,
-  Payment as PaymentIcon,
   CheckCircle as CheckCircleIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';

@@ -27,7 +27,6 @@ import {
 } from '@mui/material';
 import {
   Visibility as ViewIcon,
-  LocalShipping as ShippingIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { formatInr } from '../../utils/currency';
