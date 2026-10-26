@@ -14,6 +14,7 @@ const Header = () => {
   
   const userLogin = useSelector((state) => state.auth);
   const { userInfo } = userLogin;
+  const isAdmin = Boolean(userInfo?.isAdmin || userInfo?.role === 'admin');
   const cartItemsCount = useSelector(selectCartItemsCount);
 
   const handleDrawerToggle = () => {
@@ -66,9 +67,14 @@ const Header = () => {
           <MenuItem key="profile" onClick={() => { handleMenuClose(); navigate('/account'); }}>
             <Person sx={{ mr: 1 }} /> My Profile
           </MenuItem>,
-          userInfo.isAdmin && (
+          isAdmin && (
             <MenuItem key="dashboard" onClick={() => { handleMenuClose(); navigate('/admin/dashboard'); }}>
-              <Dashboard sx={{ mr: 1 }} /> Admin Dashboard
+              <Dashboard sx={{ mr: 1 }} /> Admin Analytics
+            </MenuItem>
+          ),
+          isAdmin && (
+            <MenuItem key="orders" onClick={() => { handleMenuClose(); navigate('/admin/orders'); }}>
+              <ShoppingCart sx={{ mr: 1 }} /> Manage Orders
             </MenuItem>
           ),
           <Divider key="divider" />,
@@ -101,10 +107,15 @@ const Header = () => {
             <ListItemText primary="My Account" />
           </ListItem>
         )}
-        {userInfo?.isAdmin && (
-          <ListItem button component={Link} to="/admin/dashboard">
-            <ListItemText primary="Admin Dashboard" />
-          </ListItem>
+        {isAdmin && (
+          <>
+            <ListItem button component={Link} to="/admin/dashboard">
+              <ListItemText primary="Admin Analytics" />
+            </ListItem>
+            <ListItem button component={Link} to="/admin/orders">
+              <ListItemText primary="Admin Orders" />
+            </ListItem>
+          </>
         )}
       </List>
     </div>
@@ -130,6 +141,25 @@ const Header = () => {
           color: '#ffffff'
         }
       }}>
+        {/* Luxury Bullion Spot Rate Ticker Bar */}
+        <Box sx={{ 
+          backgroundColor: '#8b6914', 
+          color: '#fdfbf7', 
+          py: 0.4, 
+          px: 2, 
+          display: { xs: 'none', sm: 'flex' },
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(255,255,255,0.15)'
+        }}>
+          <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '0.03em' }}>
+            Live Bullion Benchmark: 24K Gold ₹7,350/g | 22K Gold ₹6,740/g | 18K Gold ₹5,510/g | Silver 925 ₹88/g
+          </Typography>
+          <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '0.03em' }}>
+            BIS Hallmark Certified • 100% Insured Delivery Across India
+          </Typography>
+        </Box>
+
         <Toolbar>
           <IconButton
             color="inherit"
@@ -153,7 +183,7 @@ const Header = () => {
               letterSpacing: 1,
             }}
           >
-            GEHANA JEWELRY
+            GAHANA JEWELRY
           </Typography>
           
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
@@ -171,6 +201,28 @@ const Header = () => {
             >
               Shop
             </Button>
+            {isAdmin && (
+              <Button
+                component={Link}
+                to="/admin/dashboard"
+                variant="outlined"
+                size="small"
+                sx={{
+                  color: '#ffffff',
+                  borderColor: 'rgba(255,255,255,0.7)',
+                  borderRadius: '2px',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  ml: 1,
+                  '&:hover': {
+                    borderColor: '#ffffff',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                  }
+                }}
+              >
+                Admin Panel
+              </Button>
+            )}
             <IconButton color="inherit" component={Link} to="/cart" sx={{ ml: 1 }}>
               <Badge badgeContent={cartItemsCount} color="secondary">
                 <ShoppingCart />

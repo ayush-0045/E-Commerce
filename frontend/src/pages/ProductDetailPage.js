@@ -15,7 +15,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { products } from "../data/products";
-import { formatInrAsUsd } from "../utils/currency";
+import { formatInr } from "../utils/currency";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -92,7 +92,7 @@ const ProductDetailPage = () => {
           {/* Price */}
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
             <Typography variant="h5" fontWeight="bold" color="primary">
-              {formatInrAsUsd(product.price)}
+              {formatInr(product.price)}
             </Typography>
             {product.originalPrice > product.price && (
               <Typography
@@ -102,12 +102,12 @@ const ProductDetailPage = () => {
                   color: 'text.secondary',
                 }}
               >
-                {formatInrAsUsd(product.originalPrice)}
+                {formatInr(product.originalPrice)}
               </Typography>
             )}
             {product.isOnSale && (
               <Chip 
-                label={`Save ${formatInrAsUsd(product.originalPrice - product.price)}`}
+                label={`Save ${formatInr(product.originalPrice - product.price)}`}
                 color="error"
                 size="small"
                 sx={{ fontWeight: 'bold' }}

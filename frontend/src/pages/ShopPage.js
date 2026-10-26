@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../features/cart/cartSlice';
+import { toast } from 'react-toastify';
 import {
   Container,
   Grid,
@@ -75,6 +78,7 @@ const ShopPage = () => {
   
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -635,41 +639,28 @@ const ShopPage = () => {
               <Grid container spacing={2} sx={{ p: 2 }}>
                 {filteredProducts.map((product) => (
                   <Grid item key={product.id} xs={6} sm={4} md={3} lg={2.4}>
-                    <Card sx={{ 
-                      height: '100%', 
-                      display: 'flex', 
-                      flexDirection: 'column',
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: 3,
-                      },
-                    }}>
-                      <CardActions sx={{ p: 0 }}>
-                        <Button 
-                          fullWidth 
-                          variant="outlined" 
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/product/${product.id}`);
-                          }}
-                          sx={{ 
-                            borderBottomLeftRadius: 0, 
-                            borderBottomRightRadius: 0,
-                            '&:hover': {
-                              bgcolor: 'primary.main',
-                              color: 'white',
-                            },
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </CardActions>
+                    <Card 
+                      sx={{ 
+                        height: '100%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        cursor: 'pointer',
+                        borderRadius: '2px',
+                        border: '1px solid #e8e8e8',
+                        transition: 'transform 0.2s, box-shadow 0.2s',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 6px 18px rgba(183,139,32,0.15)',
+                          borderColor: '#b78b20',
+                        },
+                      }}
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    >
                       <Box sx={{ 
                         position: 'relative',
                         paddingTop: '100%',
                         overflow: 'hidden',
+                        backgroundColor: '#fafafa',
                       }}>
                         <CardMedia
                           component="img"
@@ -680,6 +671,10 @@ const ShopPage = () => {
                             width: '100%',
                             height: '100%',
                             objectFit: 'cover',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                              transform: 'scale(1.05)',
+                            },
                           }}
                           image={product.image}
                           alt={product.name}
@@ -689,21 +684,21 @@ const ShopPage = () => {
                           }}
                         />
                       </Box>
-                      <CardContent sx={{ flexGrow: 1, p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                        <Typography variant="subtitle2" noWrap title={product.name}>
+                      <CardContent sx={{ flexGrow: 1, p: 1.5, '&:last-child': { pb: 1 } }}>
+                        <Typography variant="subtitle2" noWrap title={product.name} sx={{ fontWeight: 600 }}>
                           {product.name}
                         </Typography>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="caption" color="text.secondary">
                             {product.metalType} • {product.gemstone}
                           </Typography>
-                          <Typography variant="subtitle2" color="primary" fontWeight="bold">
+                          <Typography variant="subtitle2" sx={{ color: '#b78b20', fontWeight: 700 }}>
                             {formatInr(product.price)}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                           <Typography variant="caption" color="text.secondary">
-                            {product.rating} ★ ({product.reviews})
+                            ★ {product.rating} ({product.reviews})
                           </Typography>
                           <Box sx={{ display: 'flex', gap: 0.5 }}>
                             {product.isOnSale && (
@@ -714,6 +709,7 @@ const ShopPage = () => {
                                 sx={{ 
                                   height: 20, 
                                   fontSize: '0.65rem',
+                                  borderRadius: '2px',
                                   '& .MuiChip-label': { px: 0.75 }
                                 }} 
                               />
@@ -722,10 +718,12 @@ const ShopPage = () => {
                               <Chip 
                                 label="New" 
                                 size="small" 
-                                color="success" 
                                 sx={{ 
                                   height: 20, 
                                   fontSize: '0.65rem',
+                                  borderRadius: '2px',
+                                  backgroundColor: '#1b5e20',
+                                  color: '#ffffff',
                                   '& .MuiChip-label': { px: 0.75 }
                                 }} 
                               />
@@ -733,6 +731,43 @@ const ShopPage = () => {
                           </Box>
                         </Box>
                       </CardContent>
+                      <CardActions sx={{ p: 1.5, pt: 0 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(
+                              addToCart({
+                                product: product.id,
+                                name: product.name,
+                                image: product.image,
+                                price: product.price,
+                                countInStock: product.stock || 10,
+                                qty: 1,
+                                size: product.size || 'Standard',
+                              })
+                            );
+                            toast.success(`${product.name} added to cart`);
+                          }}
+                          sx={{
+                            color: '#b78b20',
+                            borderColor: '#b78b20',
+                            borderRadius: '2px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            py: 0.6,
+                            '&:hover': {
+                              borderColor: '#8b6914',
+                              backgroundColor: '#b78b20',
+                              color: '#ffffff',
+                            },
+                          }}
+                        >
+                          Add to Cart
+                        </Button>
+                      </CardActions>
                     </Card>
                   </Grid>
                 ))}
